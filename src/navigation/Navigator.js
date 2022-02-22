@@ -3,9 +3,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createStackNavigator } from '@react-navigation/stack'
 import PropTypes from 'prop-types'
 import React, { useEffect, useState } from 'react'
-import DeviceInfo from 'react-native-device-info'
 import { Platform } from 'react-native'
-
+import * as Device from 'expo-device'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 /* components */
@@ -31,6 +30,9 @@ import ResourcesScreen from '../screens/ResourcesScreen'
 import ResourcesNationalScreen from '../screens/ResourcesNationalScreen'
 import ResourcesProvincialScreen from '../screens/ResourcesProvincialScreen'
 
+/* utils */
+import devicesWithNotch from '../utils/hasNotch'
+
 // Navigators
 const IntroductionStack = createStackNavigator()
 const OnboardingStack = createStackNavigator()
@@ -48,7 +50,8 @@ function Navigator(props) {
   const padTop = insets.top + notchAdjustment
 
   useEffect(() => {
-    if (Platform.OS === 'android' && DeviceInfo.hasNotch()) {
+    let obj = devicesWithNotch.find(o => o.model === Device.modelName)
+    if (Platform.OS === 'android' && obj !== undefined) {
       setNotchAdjustment(10)
     }
   }, [])
