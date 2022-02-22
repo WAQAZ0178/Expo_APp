@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "BEFORE",
+    "description": "Begin Exploring Fertility Options, Risks & Expectations (BEFORE)",
+    "slug": "before",
+    "privacy": "public",
+    "version": "2.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#ffffff",
+    "primaryColor": "#83296B",
+    "icon": "./src/assets/images/icon.png",
+    "entryPoint": "./index.js",
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "ios": {
+      "bundleIdentifier": "com.qochealth.stmikes.before",
+      "buildNumber": "2.0.0",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.qochealth.stmikes.before",
+      "versionCode": 2
+    },
+    "splash": {
+      "image": "./src/assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#43456F"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "packagerOpts": {
+      "config": "metro.config.js",
+      "sourceExts": [
+        "expo.ts",
+        "expo.tsx",
+        "expo.js",
+        "expo.jsx",
+        "ts",
+        "tsx",
+        "js",
+        "jsx",
+        "json",
+        "wasm",
+        "svg"
+      ]
+    }
+  }
+}

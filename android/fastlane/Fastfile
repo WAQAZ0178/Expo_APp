@@ -1,0 +1,74 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:android)
+
+platform :android do
+  def buildApp(flavor, buildType)
+    if flavor && buildType
+      # react native specific, to set env variables
+      Dir.chdir("../..") do
+        sh("npm run env:#{flavor.downcase}")
+      end
+
+      # build app by flavor and build type
+      gradle(
+        task: "app:assemble",
+        flavor: flavor,
+        build_type: buildType
+      )
+    end
+  end
+
+  desc "Build application"
+  lane :build do |options|
+    buildApp(options[:flavor], options[:buildType])
+  end
+
+  desc "Deploy using firebase app distribution"
+  lane :deploy_firebase do |options|
+    flavor = options[:flavor]
+    releaseNotesFile = options[:releaseNotesFile]
+
+    if flavor && releaseNotesFile
+      # detect firebase app id based on flavor (default to dev)
+      devAppId = "1:371798968546:android:5dbf8a4a65f58551adb6bb"
+      uatAppId = "1:644759466710:android:bc41357955373a187fcf77"
+      # local will use either dev, uat, or prod app id
+      localAppId = devAppId
+      appId = 
+        if flavor.downcase == "local"
+          localAppId
+        elsif flavor.downcase == "uat"
+          uatAppId
+        else
+          devAppId
+        end
+
+      # build application
+      buildApp(flavor, "Release")
+
+      # distribute app to firebase
+      firebase_app_distribution(
+        app: appId,
+        groups: "qoc-devs, qa-team",
+        release_notes_file: "./fastlane/release-notes/#{releaseNotesFile}",
+        debug: true
+      )
+    else
+      puts "You did not provide flavor or releaseNotesFile"
+    end
+  end
+end

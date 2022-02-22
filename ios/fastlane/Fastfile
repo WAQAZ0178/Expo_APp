@@ -1,0 +1,122 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+  # get ipa name based on env
+  def getIpaName(env)
+    env.downcase == "prod" ? "before" : "before-#{env.downcase}"
+  end
+
+  # get scheme based on env
+  def getScheme(env)
+    case env.downcase
+    when "dev"
+      "Dev BEFORE"
+    when "uat"
+      "Uat BEFORE"
+    when "prod"
+      "Prod BEFORE"
+    else
+      "BEFORE"
+    end
+  end
+
+  # get ipa name based on env
+  def getAppId(env)
+    env.downcase == "prod" ? "com.qochealth.stmikes.before" : "com.qochealth.stmikes.before.#{env.downcase}"
+  end
+
+  def getFirebaseAppId(env)
+    devAppId = "1:371798968546:ios:1016ee8080cbf731adb6bb"
+    uatAppId = "1:644759466710:ios:8496ddda2140de1f7fcf77"
+
+    case env.downcase
+    when "dev"
+      devAppId
+    when "uat"
+      uatAppId
+    else
+      devAppId
+    end
+  end
+
+  def buildApp(env, rnBuildEnv)
+    if env
+      # react native specific, to set env variables
+      Dir.chdir("../..") do
+        if rnBuildEnv
+          sh("npm run env:#{rnBuildEnv.downcase}")
+        else
+          sh("npm run env:#{env.downcase}")
+        end
+      end
+
+      # build app by env
+      build_app(
+        output_name: getIpaName(env),
+        export_method: "development",
+        scheme: getScheme(env),
+      )
+    end
+  end
+
+  desc "Create app in Apple Store Connect & Developer console"
+  lane :create_app do |options|
+    env = options[:env]
+    produce(
+      app_identifier: getAppId(env),
+      app_name: "BEFORE - Stmikes #{env.downcase}",
+      app_version: "en-US",
+      sku: getAppId(env),
+    )
+  end
+
+  desc "Code sign"
+  lane :sign_app do
+    match(
+      app_identifier: [getAppId("local"), getAppId("dev"), getAppId("uat"), getAppId("prod")]
+    )
+  end
+
+  desc "Build app based on env"
+  lane :build do |options|
+    buildApp(options[:env], options[:rnBuildEnv])
+  end
+
+  desc "Deploy using firebase app distribution"
+  lane :deploy_firebase do |options|
+    env = options[:env]
+    ipaName = options[:ipaName]
+    releaseNotesFile = options[:releaseNotesFile]
+
+    if env && releaseNotesFile
+      # set appId based on env (default to dev)
+      appId = getFirebaseAppId(env)
+
+      # distribute app to firebase
+      firebase_app_distribution(
+        app: appId,
+        ipa_path: ipaName ? "./#{ipaName}.ipa" : "./#{getIpaName(env)}.ipa",
+        groups: "qoc-devs, qa-team",
+        release_notes_file: "./fastlane/release-notes/#{releaseNotesFile}",
+        debug: true
+      )
+    else
+      puts "You did not provide env or releaseNotesFile"
+    end
+  end
+end

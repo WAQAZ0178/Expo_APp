@@ -1,0 +1,13 @@
+- add carousel component
+- update nav icons
+- update style of components and UI
+- save progress
+- add introduction, onboarding, profile flow
+- refactor static screens to render based of content sheet (glossary, exercises (not options), introduction, onboarding, resources, the team, disclaimer)
+- progress bar
+- fix ui bugs
+- add image component
+- add markdown component and functionality to paragraph and accordion content
+- add carousel card component
+- app icons
+- splash screen

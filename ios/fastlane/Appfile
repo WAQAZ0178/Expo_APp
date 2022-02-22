@@ -1,0 +1,6 @@
+apple_id("yves.matta@qochealth.com")
+team_name("QOC Health Inc.")
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile
+#     https://www.rubydoc.info/gems/credentials_manager/0.13.0/CredentialsManager/AppfileConfig

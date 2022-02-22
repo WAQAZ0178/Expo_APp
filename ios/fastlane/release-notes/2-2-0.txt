@@ -1,0 +1,2 @@
+iOS:
+- update bundle identifiers & google services info

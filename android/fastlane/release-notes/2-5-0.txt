@@ -1,0 +1,3 @@
+- fix bugs
+- add card component
+- update to have master & detail views
